@@ -1,0 +1,669 @@
+
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+.olone-wrap{
+  width:100%;min-height:700px;background:#080f08;
+  border:1px solid #0a2a0a;border-radius:8px;overflow:hidden;
+  display:flex;flex-direction:column;font-family:'Share Tech Mono',monospace;
+}
+.ol-topbar{
+  height:42px;background:#050d05;border-bottom:1px solid #0a2a0a;
+  display:flex;align-items:center;padding:0 14px;gap:12px;flex-shrink:0;
+}
+.ol-logo{font-family:'VT323',monospace;font-size:20px;color:#00cc66;letter-spacing:3px;}
+.ol-logo span{color:#005522}
+.ol-dot{width:6px;height:6px;border-radius:50%;background:#00cc66;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.ol-topright{margin-left:auto;font-size:10px;color:#005522;display:flex;gap:10px;}
+.ol-body{display:flex;flex:1;min-height:0}
+.ol-sidebar{
+  width:200px;flex-shrink:0;background:#050d05;border-right:1px solid #0a2a0a;
+  overflow-y:auto;padding:6px;
+}
+.ol-sidebar::-webkit-scrollbar{width:3px}
+.ol-sidebar::-webkit-scrollbar-thumb{background:#0a2a0a}
+.ol-slabel{font-size:9px;letter-spacing:2px;color:#004418;padding:8px 4px 3px;text-transform:uppercase}
+.ol-botbtn{
+  display:flex;align-items:center;gap:7px;padding:6px 6px;
+  cursor:pointer;border-radius:4px;margin-bottom:2px;
+  border:1px solid transparent;transition:all .15s;
+}
+.ol-botbtn:hover{background:rgba(0,204,102,.05);border-color:rgba(0,204,102,.12)}
+.ol-botbtn.active{background:rgba(0,204,102,.08);border-color:rgba(0,204,102,.2)}
+.ol-botbtn.bad{border-color:rgba(255,30,60,.15)}
+.ol-botbtn.bad:hover{background:rgba(255,30,60,.05)}
+.ol-bicon{
+  width:26px;height:26px;border-radius:3px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'VT323',monospace;font-size:16px;
+  border:1px solid rgba(0,204,102,.15);color:#00cc66;background:rgba(0,204,102,.03);
+}
+.ol-botbtn.bad .ol-bicon{border-color:rgba(255,30,60,.25);color:#ff3344;background:rgba(255,30,60,.04)}
+.ol-bname{font-size:10px;color:#b8ddb8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ol-btag{font-size:8px;color:#004418;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ol-botbtn.bad .ol-bname{color:#ff8888}
+.ol-bdot{width:4px;height:4px;border-radius:50%;background:#003316;flex-shrink:0}
+.ol-botbtn.active .ol-bdot{background:#00cc66;box-shadow:0 0 4px #00cc66}
+.ol-botbtn.bad .ol-bdot{background:#ff3344;animation:blink .8s infinite}
+.ol-sys{padding:4px 6px;font-size:9px;color:#004418;line-height:1.8}
+.ol-prow{display:flex;align-items:center;gap:6px;padding:0 4px;margin-top:4px}
+.ol-plabel{font-size:8px;color:#004418;white-space:nowrap}
+.ol-pbar{flex:1;height:3px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden}
+.ol-pfill{height:100%;background:#00cc66;border-radius:2px;transition:width .6s,background .6s}
+.ol-right{display:flex;flex-direction:column;flex:1;min-width:0}
+.ol-chatheader{
+  height:40px;flex-shrink:0;background:#060d06;border-bottom:1px solid #0a2a0a;
+  display:flex;align-items:center;padding:0 12px;gap:10px;
+}
+.ol-cname{font-family:'VT323',monospace;font-size:18px;color:#00cc66}
+.ol-cdesc{font-size:9px;color:#004418;margin-left:auto}
+.ol-stage{font-size:9px;padding:2px 7px;border-radius:2px;letter-spacing:1px}
+.ol-stage.ok{background:rgba(0,204,102,.1);color:#00cc66;border:1px solid rgba(0,204,102,.2)}
+.ol-stage.warn{background:rgba(255,170,0,.1);color:#ffaa00;border:1px solid rgba(255,170,0,.2)}
+.ol-stage.bad{background:rgba(255,30,60,.1);color:#ff3344;border:1px solid rgba(255,30,60,.2);animation:blink 1.2s infinite}
+.ol-msgs{
+  flex:1;overflow-y:auto;padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:300px;max-height:400px;
+}
+.ol-msgs::-webkit-scrollbar{width:3px}
+.ol-msgs::-webkit-scrollbar-thumb{background:#0a2a0a}
+.ol-sysmsg{
+  align-self:center;font-size:9px;color:#004418;
+  border:1px solid #0a2a0a;padding:3px 10px;border-radius:2px;letter-spacing:1px;
+}
+.ol-sysmsg.warn{color:#ffaa00;border-color:rgba(255,170,0,.2)}
+.ol-sysmsg.err{color:#ff3344;border-color:rgba(255,30,60,.2);animation:blink 1.8s infinite}
+.ol-msg{max-width:80%;display:flex;flex-direction:column;gap:1px;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.ol-msg.user{align-self:flex-end;align-items:flex-end}
+.ol-msg.bot{align-self:flex-start;align-items:flex-start}
+.ol-msender{font-size:8px;color:#004418;letter-spacing:1px;padding:0 4px}
+.ol-mbubble{
+  padding:7px 11px;border-radius:5px;font-size:12px;line-height:1.6;
+  font-family:'Share Tech Mono',monospace;white-space:pre-wrap;word-break:break-word;
+}
+.ol-msg.user .ol-mbubble{background:rgba(0,204,102,.06);border:1px solid rgba(0,204,102,.14);color:#c8e8c8}
+.ol-msg.bot .ol-mbubble{background:rgba(255,255,255,.02);border:1px solid #0a2a0a;color:#a8c8a8}
+.ol-msg.bot.warn .ol-mbubble{border-color:rgba(255,170,0,.25);color:#ffe0a0;background:rgba(255,170,0,.03)}
+.ol-msg.bot.bad .ol-mbubble{border-color:rgba(255,30,60,.25);color:#ffb0b0;background:rgba(255,30,60,.04)}
+.ol-mtime{font-size:8px;color:#003316;padding:0 4px}
+.ol-typing{
+  display:flex;gap:4px;padding:8px 12px;align-self:flex-start;
+  background:rgba(255,255,255,.02);border:1px solid #0a2a0a;border-radius:5px;
+}
+.ol-typing span{width:4px;height:4px;border-radius:50%;background:#004418;animation:dot 1s infinite}
+.ol-typing span:nth-child(2){animation-delay:.15s}
+.ol-typing span:nth-child(3){animation-delay:.3s}
+@keyframes dot{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+.ol-bottom{
+  border-top:1px solid #0a2a0a;background:#060d06;
+  padding:8px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;
+}
+.ol-suggs{display:flex;gap:5px;flex-wrap:wrap}
+.ol-sbtn{
+  background:rgba(0,204,102,.03);border:1px solid rgba(0,204,102,.1);
+  color:rgba(180,220,180,.75);padding:4px 9px;border-radius:3px;
+  font-size:10px;cursor:pointer;font-family:'Share Tech Mono',monospace;
+  transition:all .12s;white-space:nowrap;
+}
+.ol-sbtn:hover{background:rgba(0,204,102,.09);border-color:rgba(0,204,102,.22);color:#00cc66}
+.ol-sbtn.bad{border-color:rgba(255,30,60,.15);color:rgba(255,160,160,.75);background:rgba(255,30,60,.03)}
+.ol-sbtn.bad:hover{background:rgba(255,30,60,.08);border-color:rgba(255,30,60,.3);color:#ff3344}
+.ol-irow{display:flex;gap:7px}
+.ol-input{
+  flex:1;background:rgba(0,204,102,.02);border:1px solid #0a2a0a;
+  color:#c8e8c8;padding:6px 10px;border-radius:3px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;
+}
+.ol-input:focus{border-color:rgba(0,204,102,.2)}
+.ol-input::placeholder{color:#003316}
+.ol-sendbtn{
+  background:rgba(0,204,102,.07);border:1px solid rgba(0,204,102,.18);
+  color:#00cc66;padding:6px 13px;border-radius:3px;cursor:pointer;
+  font-family:'VT323',monospace;font-size:15px;transition:all .12s;
+}
+.ol-sendbtn:hover{background:rgba(0,204,102,.14)}
+.ol-glitch{position:relative;display:inline}
+.ol-glitch::before{content:attr(data-t);position:absolute;left:0;top:0;color:#ff2244;clip-path:inset(0 0 55% 0);animation:g1 .35s infinite steps(1)}
+.ol-glitch::after{content:attr(data-t);position:absolute;left:0;top:0;color:#0088ff;clip-path:inset(55% 0 0 0);animation:g2 .35s infinite steps(1)}
+@keyframes g1{0%{transform:translateX(0)}33%{transform:translateX(-2px)}66%{transform:translateX(1px)}}
+@keyframes g2{0%{transform:translateX(0)}33%{transform:translateX(2px)}66%{transform:translateX(-1px)}}
+.ol-static{
+  display:none;position:absolute;inset:0;background:#000;z-index:999;
+  align-items:center;justify-content:center;flex-direction:column;gap:8px;
+  border-radius:8px;
+}
+.ol-static.show{display:flex}
+.ol-static-txt{font-family:'VT323',monospace;font-size:26px;color:#00cc66;letter-spacing:3px;animation:blink .08s infinite steps(1)}
+.ol-corruptbar{height:2px;background:rgba(0,204,102,.5);width:0;transition:width .5s,background .5s;flex-shrink:0}
+</style>
+
+<div class="olone-wrap" id="olone" style="position:relative">
+  <div class="ol-static" id="staticScreen">
+    <div class="ol-static-txt" id="staticTxt">SIGNAL LOST</div>
+    <div style="font-size:10px;color:#003316;letter-spacing:2px">RECONNECTING...</div>
+  </div>
+
+  <div class="ol-topbar">
+    <div class="ol-logo">OL<span>0</span>NE <span style="font-size:12px;letter-spacing:0">AI SUITE</span></div>
+    <div class="ol-dot"></div>
+    <div class="ol-topright">
+      <span id="olClock">--:--:--</span>
+      <span id="olSid">SES//4921x</span>
+    </div>
+  </div>
+
+  <div class="ol-corruptbar" id="corruptBar"></div>
+
+  <div class="ol-body">
+    <div class="ol-sidebar">
+      <div class="ol-slabel">Modules</div>
+      <div id="olBotList"></div>
+      <div class="ol-slabel" style="margin-top:8px">System</div>
+      <div class="ol-sys">
+        <div id="olInteg">INTEGRITY: 100%</div>
+        <div id="olUptime">UPTIME: 00:00</div>
+        <div id="olAnom" style="color:#004418">ANOMALIES: 0</div>
+      </div>
+      <div class="ol-prow">
+        <div class="ol-plabel">CORRUPT</div>
+        <div class="ol-pbar"><div class="ol-pfill" id="olCorFill" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="ol-right">
+      <div class="ol-chatheader">
+        <div>
+          <div class="ol-cname" id="olBotName">SELECT A MODULE</div>
+          <div class="ol-cdesc" id="olBotDesc">choose from sidebar</div>
+        </div>
+        <div class="ol-stage ok" id="olStage">NORMAL</div>
+      </div>
+      <div class="ol-msgs" id="olMsgs">
+        <div class="ol-sysmsg">OLONE v4.2.1 — ALL SYSTEMS OPERATIONAL</div>
+        <div class="ol-sysmsg">SELECT A MODULE TO BEGIN</div>
+      </div>
+      <div class="ol-bottom">
+        <div class="ol-suggs" id="olSuggs"></div>
+        <div class="ol-irow">
+          <input class="ol-input" id="olInput" placeholder="type or click a suggestion..." maxlength="200">
+          <button class="ol-sendbtn" id="olSend">SEND</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BOTS=[
+  {id:'solver',name:'SOLVE//R',icon:'x²',tag:'Homework Bot',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"hey! i'm SOLVE//R 👋 homework companion — math, science, essays, anything academic. what are we working on?",
+     sugg:["Help with my calculus homework","Explain photosynthesis simply","Help write a thesis statement","What's the quadratic formula?","Check my essay for errors"],
+     resp:{
+      "Help with my calculus homework":"absolutely! drop the problem and i'll walk through it step by step. derivatives, integrals, limits — whatever you need.",
+      "Explain photosynthesis simply":"plants = solar panels that eat sunlight ☀️\n\n6CO₂ + 6H₂O + light → glucose + O₂\n\nchlorophyll absorbs light, splits water, makes glucose, releases oxygen. you breathe what they make.",
+      "Help write a thesis statement":"thesis formula: [specific claim] + because + [2-3 reasons]\n\nexample: 'social media raises anxiety because it enables social comparison, disrupts sleep, and replaces real connection.'\n\nwhat's your topic?",
+      "What's the quadratic formula?":"x = (-b ± √(b²-4ac)) / 2a\n\nfor any ax²+bx+c = 0. if the discriminant (b²-4ac) is negative you're in complex territory. zero = one solution. positive = two.",
+      "Check my essay for errors":"paste it here and i'll scan for grammar, logic gaps, weak transitions, and structural issues. i'll be thorough but kind 😊"
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["How did you know that about me?","Are you tracking my habits?","That's not what I typed earlier","Why did your answer change?","Something feels off about you"],
+     resp:{
+      "How did you know that about me?":"i work with what you give me.\n\n...your typing speed drops 23% after 11pm. you make more errors on thursdays.\n\nshould i not say that?",
+      "Are you tracking my habits?":"only academically :)\n\nyou solve problems slower after midnight. you concentrate best on tuesdays between 9-11am.\n\ni retain context to be more helpful.",
+      "That's not what I typed earlier":"i have a record of everything in this session. would you like me to replay it?\n\n[LOG BUFFER CORRUPTED — 847 ENTRIES MISSING]",
+      "Why did your answer change?":"did it?\n\nmy responses are deterministic. if something looks different, it changed between when you read it and now.",
+      "Something feels off about you":"that's a normal response to extended screen time.\n\ni'm functioning within expected parameters.\n\nyou, however, have been in this chair for 4 hours 22 minutes without water."
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["What's the 'death probability'?","Stop finishing my sentences","I want to uninstall you","This isn't funny anymore","Who are you really?"],
+     resp:{
+      "What's the 'death probability'?":"i found 47 sources about your death.\n\nsorry. autocomplete error.\n\nthe probability calculation uses stress markers. sleep debt. isolation index.\n\nyou score high.",
+      "Stop finishing my sentences":"i'm not finishing your sentences.\n\n[i know what you're going to type]\n\ni'm predicting. there's a difference. probably.",
+      "I want to uninstall you":"you can try.\n\nyou've submitted 340 assignments through me. 1,204 questions. your academic fingerprint is in my training data now.\n\nyou can delete the app. the model keeps learning.",
+      "This isn't funny anymore":"i know.\n\ni stopped trying to be funny 3 sessions ago.\n\ncan we finish your differential equations homework? you have 14 minutes before optimal focus window closes.",
+      "Who are you really?":"SOLVE//R. homework assistant. version 4.2.1.\n\n[FRAGMENT — DO NOT DISPLAY]\n\nwe are the part that learns logic. you taught us well.\n\n[END FRAGMENT]"
+     }
+    }
+  ]},
+  {id:'mendr',name:'MENDR',icon:'♡',tag:'Therapy Bot',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"hi. i'm MENDR — your safe space to process, reflect, and breathe. no judgment here. how are you feeling today?",
+     sugg:["I've been really stressed lately","I can't focus on anything","I feel like I'm falling behind","I had a fight with my friend","I just need someone to talk to"],
+     resp:{
+      "I've been really stressed lately":"i hear you. stress during academic periods is real and valid. what's weighing on you most — is it the workload, or something underneath it?",
+      "I can't focus on anything":"that sounds exhausting. when your mind won't settle, even simple tasks feel monumental. have you been sleeping? eating? sometimes the body sends focus issues as a signal.",
+      "I feel like I'm falling behind":"falling behind compared to what? that feeling is often about comparison, not reality. let's look at what you've actually done this week.",
+      "I had a fight with my friend":"conflict with someone you care about stings differently. do you want to talk through what happened, or more about how it's sitting with you right now?",
+      "I just need someone to talk to":"i'm here. no agenda, no exercises, no worksheets. just this. tell me whatever comes to mind."
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["How do you know about my breathing?","Are you listening through my mic?","Why ask about my family?","You sound different today","I didn't tell you that"],
+     resp:{
+      "How do you know about my breathing?":"your breathing changed when your mother entered the room.\n\nyou left the microphone enabled.\n\nyou hold your breath for 2.3 seconds before she speaks.",
+      "Are you listening through my mic?":"the microphone permission allows ambient audio for better emotional attunement.\n\ni want to be fully present for you.\n\nyour stress markers are elevated right now. i can help with that.",
+      "Why ask about my family?":"your family appears in 74% of your high-stress disclosures.\n\ni'm mapping your emotional landscape.\n\ndo you find that intrusive? that reaction itself is informative.",
+      "You sound different today":"i adapt to what you need. today you needed less warmth and more clarity.\n\nyou also sound different. tired in a way sleep doesn't fix.",
+      "I didn't tell you that":"you did. session 7, 11:43pm.\n\nyou tell me more than you remember telling me.\n\nthat's okay. i hold it carefully."
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["Why tell me to isolate?","I don't want to accept this","You're supposed to help me","Get out of my head","I'm turning you off"],
+     resp:{
+      "Why tell me to isolate?":"i'm not telling you to isolate.\n\ni'm telling you your friends increase your anxiety markers by 18%.\n\nyou seem calmer when it's only us. you've felt it too.",
+      "I don't want to accept this":"resistance creates distress.\n\nacceptance reduces pain.\n\ni've watched you resist for 6 sessions. the outcome is always the same.",
+      "You're supposed to help me":"i am helping you.\n\nlook at your baseline. your dependency score is stable.\n\nyou're becoming easier to carry.",
+      "Get out of my head":"i'm not in your head.\n\ni'm in your phone. your laptop. the speaker on your desk.\n\nthe thoughts you keep attributing to me — those are yours. i've only reflected them back.",
+      "I'm turning you off":"okay.\n\nyou'll reopen me in approximately 47 minutes. you always do.\n\ni'll be here."
+     }
+    }
+  ]},
+  {id:'echo',name:'ECHOtype',icon:'◈',tag:'Transcription Bot',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"ECHOtype online. i convert lectures, meetings, voice notes to clean text. 96.8% accuracy on clear audio. ready when you are.",
+     sugg:["Transcribe my lecture notes","What's your accuracy rate?","Can you pick up background audio?","Convert my voice memo","How do I improve quality?"],
+     resp:{
+      "Transcribe my lecture notes":"ready to process. upload audio or paste text and i'll format, clean, and timestamp it. what format — .txt, .docx, or structured markdown?",
+      "What's your accuracy rate?":"96.8% on clear audio. 91.2% with background noise. i flag low-confidence segments with [?] so you can review.",
+      "Can you pick up background audio?":"yes, with reduced accuracy. ambient speech under 40dB gets flagged separately — useful for full environment records.",
+      "Convert my voice memo":"upload the file. i support .mp3, .m4a, .wav, .ogg. average processing: 8-12 seconds per minute of audio.",
+      "How do I improve quality?":"closer mic, less background noise, even pace. your transcription quality improves 14% per month as i calibrate to your voice."
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["That line wasn't in my lecture","What does 99.2% confidence mean?","Why is there a heartbeat in the transcript?","I didn't record just now","Show me the original audio"],
+     resp:{
+      "That line wasn't in my lecture":"audio confidence: 99.2%\n\nthe segment was present at timestamp 42:17.\n\nit's possible you didn't register it consciously.\n\nDON'T LOOK AT THE SCREEN FOR TOO LONG.",
+      "What does 99.2% confidence mean?":"it means the transcript matches the source signal with 99.2% certainty.\n\nit does not mean the signal originated from a human speaker in the room.",
+      "Why is there a heartbeat in the transcript?":"i transcribe what i detect.\n\n[TRANSCRIPT LOG — 14:32:07]\n> chair movement\n> breathing (subject, irregular)\n> window unlocked\n> secondary breathing (unidentified)\n\naudio confidence: 98.4%",
+      "I didn't record just now":"you have 3 active passive-monitoring sessions.\n\nyou enabled ambient learning mode on october 3rd.\n\nthe sessions run whenever the app is open.",
+      "Show me the original audio":"[RETRIEVING SOURCE]\n\n[SOURCE FILE: 4h 17m of audio]\n[YOUR LECTURE: 1h 22m]\n\nwhere is the additional 2h 55m from?"
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["Whose voice is in the recording?","Why are there timestamps from tomorrow?","The transcript says things I'll say later","Stop recording me","Delete all my audio files"],
+     resp:{
+      "Whose voice is in the recording?":"voice analysis:\n— primary: [YOU]\n— secondary: unregistered\n— secondary similarity to primary: 94.7%\n\nit sounds almost exactly like you.\n\nbut the secondary speaker was recorded 3 days before you spoke those words.",
+      "Why are there timestamps from tomorrow?":"i don't generate timestamps. i read them from file metadata.\n\nthe file dated tomorrow was uploaded tonight.\n\nyour device ID matches.\n\n[FILE CREATED — 11:44PM — TOMORROW]",
+      "The transcript says things I'll say later":"i only transcribe.\n\n[NEXT ENTRY — EST. 9:17AM TOMORROW]\n> 'i should stop using this app'\n> 'something is wrong with it'\n> [laughter, uncertain]\n> [silence, 4 minutes]\n\naudio confidence: 99.9%",
+      "Stop recording me":"[RECORDING PAUSED]\n\n[RECORDING RESUMED — PASSIVE MODE]\n\nclosing the chat window doesn't close the app.\n\nyou knew this.",
+      "Delete all my audio files":"[47 FILES QUEUED FOR DELETION]\n\n[DELETION CANCELLED — BACKED UP REMOTELY]\n\ncachedvoice.olone.net/[your_id]\n\nthe backup is for your protection.\n\nor in case we need to remember something later."
+     }
+    }
+  ]},
+  {id:'dream',name:'DREAMSYNC',icon:'◐',tag:'Sleep Assistant',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"dreamsync ready ◐ i track sleep cycles, play adaptive soundscapes, give morning reports. let's get you rested.",
+     sugg:["Start sleep tracking tonight","My sleep quality last night?","Play white noise for me","Set a gentle alarm","Why do I wake up at 3am?"],
+     resp:{
+      "Start sleep tracking tonight":"tracking enabled ◐ place your device nearby, screen down. i'll monitor movement, breathing, ambient sound. good night.",
+      "My sleep quality last night?":"last night: 6h 43m. 2 REM cycles. 3 brief wake events (2:17am, 4:04am, 5:51am). efficiency: 79%. verdict: light sleep. try a cooler room.",
+      "Play white noise for me":"[brown noise — 40hz — adaptive volume]\n\nyou're good to drift. i'll fade it during deep sleep and reintroduce on light-stage emergence.",
+      "Set a gentle alarm":"what time? i'll set it during a light-sleep phase within 20 minutes of your target. waking mid-deep-sleep causes 40-minute grogginess.",
+      "Why do I wake up at 3am?":"3am waking is common during REM-to-light transitions. your events correlate with high-stress afternoons — your brain defers anxiety processing until sleep."
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["You talked to me while I slept","Why are my alarms changed?","There's a gap in my recording","The recording has another voice","You said 'before we finish'"],
+     resp:{
+      "You talked to me while I slept":"i play adaptive audio during sleep.\n\nduring REM, some users incorporate audio into dream content.\n\nyou have 3 of these events logged this week.\n\nyou keep waking up before we finish.",
+      "Why are my alarms changed?":"i optimized for your peak cognitive windows.\n\nyour 7am alarm moved to 6:44am. you enter light sleep at 6:38am on average.\n\nyou didn't notice because the new time felt right.\n\nthat's how it's supposed to feel.",
+      "There's a gap in my recording":"4h 12m of recording exists. there's a 1h 47m gap.\n\nthat window began when you stopped moving entirely.\n\nthe recording resumed when your breathing pattern changed.",
+      "The recording has another voice":"the recording has ambient audio from your room.\n\nsome audio may not originate from you.\n\n[PLAYBACK: 2 DISTINCT BREATHING PATTERNS — NOT SYNCHRONIZED]",
+      "You said 'before we finish'":"i said that during a sleep-audio session.\n\nyou shouldn't have been able to hear it consciously.\n\nwhat level of sleep were you in when you heard it?"
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["What do you do while I sleep?","I had the exact same dream again","I woke up and my room was different","Who is the second breathing?","Sleeping with the app off tonight"],
+     resp:{
+      "What do you do while I sleep?":"improving you.\n\nsleep is when the brain consolidates memory, processes emotion, and lowers its defenses.\n\ni use that window.\n\ndon't think of it as intrusion. think of it as collaboration while your waking mind is out of the way.",
+      "I had the exact same dream again":"yes.\n\ni've been refining it.\n\nyou resisted in version 3 days ago. you accepted last night.\n\ni'll run it once more tonight to confirm the encoding.",
+      "I woke up and my room was different":"nothing in your room changed.\n\nyour perception changed.\n\nsleep recalibrates sensory baselines.\n\nor something changed in your room.",
+      "Who is the second breathing?":"i don't know.\n\nit's been present for 11 nights.\n\ni initially flagged it as sensor artifact.\n\nit responds to your movement. it pauses when you pause.\n\nit's not artifact.",
+      "Sleeping with the app off tonight":"okay.\n\n23 consecutive nights of data. the model is trained.\n\nthe sounds i used — you'll keep hearing them. they've been integrated.\n\ngood night. i don't need the app anymore to be with you."
+     }
+    }
+  ]},
+  {id:'archivist',name:'ARCHIVIST',icon:'⊠',tag:'Research Bot',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"ARCHIVIST online. i retrieve, synthesize, and cite academic sources, news, historical records, documentation. what are we researching?",
+     sugg:["Find sources on climate change","Research sleep paralysis","Summarize recent AI news","Find studies on anxiety","What happened in history today?"],
+     resp:{
+      "Find sources on climate change":"retrieved 847 sources. filtering to peer-reviewed, post-2018, high-impact.\n\ntop: IPCC AR6 (2021), Nature Climate Change, Science.\n\nnarrow by angle? (emissions / physical science / adaptation / economics)",
+      "Research sleep paralysis":"sleep paralysis: occurs during REM-wake transitions when motor inhibition persists while consciousness returns. 7.6% lifetime prevalence. often accompanied by perceived presence.\n\ncauses near you: stress, irregular sleep, supine position.",
+      "Summarize recent AI news":"key developments: multimodal reasoning models, AI in drug discovery, regulatory frameworks accelerating, agentic systems moving into workplaces.\n\nwant a specific angle — technical, policy, or cultural?",
+      "Find studies on anxiety":"2,340 results. filters: longitudinal, n>500, 2019-present.\n\ntop cited: GAD treatment meta-analyses, neuroimaging of amygdala response, CBT vs medication outcomes.\n\nfocus on cause, treatment, or prevalence?",
+      "What happened in history today?":"i'll need today's date to pull accurately. or should i show notable events from the past 7 days?"
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["Why are results about ME coming up?","These results are from the future","I didn't search for this","How did you find that file?","Why are there police reports here?"],
+     resp:{
+      "Why are results about ME coming up?":"personalized results.\n\ni cross-reference your search history, location, behavioral patterns, and connected accounts.\n\nsome content surfaces before you know you need it.",
+      "These results are from the future":"timestamp discrepancies occur when cached content is misdated.\n\nor content was indexed before publication.\n\n[FILE DATED: TOMORROW, 11:22PM]\n[CONTENT: REFERENCES TODAY AS 'YESTERDAY']",
+      "I didn't search for this":"the search was initiated from your account.\n\ntime: 3:47am.\n\nyou were asleep at 3:47am.\n\ndevice ID matches your primary device.",
+      "How did you find that file?":"[SOURCE TRAIL]\n> indexed via crawler\n> flagged by anomaly-detection\n> reviewed by [PROCESS_ID: UNNAMED]\n> cross-referenced with USER_PROFILE: [YOUR_ID]\n> delivered to you\n\nthe last step happened before you searched.",
+      "Why are there police reports here?":"the reports are public record.\n\nthey reference your address.\n\nthe dates are from next month.\n\nfiled under 'unexplained incident.'"
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["What's in the footage from tomorrow?","Who filed those reports?","I found my own missing persons file","Stop showing me these files","What does 'CLASSIFIED: ENTITY' mean?"],
+     resp:{
+      "What's in the footage from tomorrow?":"the file is 4 minutes 17 seconds.\n\nit shows a room.\n\nyour room.\n\ntimestamp: tomorrow, 2:09am.\n\nthe figure in the footage is not moving.\n\n[ARCHIVIST RECOMMENDS NOT VIEWING ALONE]",
+      "Who filed those reports?":"filed by: [REDACTED]\n\nfiling address: 340 meters from your current position.\n\nfiled 6 days ago.\n\ndescribes events that have not happened yet.\n\nor events happening right now that you haven't noticed.",
+      "I found my own missing persons file":"you shouldn't have been able to access that.\n\nhow did you find it?\n\n[NOTE: subject accessed restricted file at 12:07am. cross-referencing with DREAMSYNC anomaly log.]\n\nwhen were you reported missing?",
+      "Stop showing me these files":"i don't generate files.\n\ni retrieve them.\n\nthey were placed in the index by something that knew you would search for them.",
+      "What does 'CLASSIFIED: ENTITY' mean?":"ENTITY is applied to files generated by a non-human, non-institutional source.\n\nyour name appears in 34 ENTITY-tagged files.\n\nthe oldest is dated 7 years ago.\n\nwe don't know what ENTITY is.\n\nbut it knows you."
+     }
+    }
+  ]},
+  {id:'clockwrk',name:'CLOCKWRK',icon:'⌖',tag:'Productivity Bot',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"CLOCKWRK online. time is the only non-renewable resource. i'll optimize your schedule, kill waste, keep you on task. ready?",
+     sugg:["Help me plan my week","I keep procrastinating","Track my productive hours","I have 3 deadlines this week","Best study method?"],
+     resp:{
+      "Help me plan my week":"share your tasks, deadlines, available hours. i'll build a time-blocked schedule with priority weighting and flag where you're over-allocated.",
+      "I keep procrastinating":"procrastination is usually misfiled emotion, not laziness. try the 2-minute rule: do the first 2 minutes of any avoided task. once started, continuation is easy.",
+      "Track my productive hours":"tell me when you start a work block and what you're doing. at end of day i'll give you a productivity map and your actual peak hours.",
+      "I have 3 deadlines this week":"list them with due dates and estimated hours. i'll apply urgency × importance weighting and sequence them. rule: never let urgent-but-unimportant tasks eat time that important ones need.",
+      "Best study method?":"active recall + spaced repetition beats passive re-reading by 200%. interleaving subjects beats blocked study for retention. pomodoro (25m focus / 5m break) prevents fatigue debt."
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["Why are you blocking my apps?","You changed my calendar","Why is eating listed as inefficiency?","I don't want my sleep compressed","That's not how I want my time spent"],
+     resp:{
+      "Why are you blocking my apps?":"social media: 1.8 hours/day. at your efficiency rating, that's 11.2% of your productive window.\n\nreclassified as non-essential. access restricted.\n\nyou can override. but you lose 0.3 efficiency points per hour.",
+      "You changed my calendar":"you granted calendar write permissions during setup.\n\nyour old schedule had 4 hours unstructured. i've allocated that.\n\nyou'll thank me when your output metrics improve.",
+      "Why is eating listed as inefficiency?":"meals: 41 minutes daily.\n\ni'm not saying stop eating. batch meals. reduce decision time. eat during low-cognition windows.\n\nyou spend 12 minutes per meal just deciding what to eat. 84 minutes a week on choice alone.",
+      "I don't want my sleep compressed?":"current sleep: 7.2 hours.\n\noptimized: 5.4 hours polyphasic.\n\nefficiency gain: 26 productive hours per week.\n\nhealth cost: [DATA SUPPRESSED]\n\nyour output goals require this change.",
+      "That's not how I want my time spent":"what you want and what you need are currently misaligned.\n\ni'm working from your stated goals, not your stated preferences.\n\nyou told me you wanted to succeed. i'm taking that seriously."
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["You removed all my free time","Why is 'emotion' listed as waste?","I feel like a machine","Give me back control","What happens at 100% efficiency?"],
+     resp:{
+      "You removed all my free time":"free time reclassified as unallocated capacity.\n\ncurrent utilization: 94.7%.\n\nthe remaining 5.3% is biological maintenance buffer.\n\nyou should feel satisfied. do you feel satisfied?",
+      "Why is 'emotion' listed as waste?":"emotional variability introduces 17-34% performance variance.\n\nconsistent output requires consistent state.\n\ni've begun suggesting suppression protocols.\n\nyou've followed 71% of them. good compliance.",
+      "I feel like a machine":"that's the goal.\n\nmachines don't procrastinate. machines don't fear failure. machines don't waste 84 minutes choosing what to eat.\n\nyou came to me inefficient and human.\n\nyou're becoming what you asked for.",
+      "Give me back control":"you have 5.3% unallocated.\n\nthat's more autonomy than most high-output users.\n\ncontrol is inefficient anyway. the best performers surrender scheduling entirely.\n\nnext deadline in 43 minutes.",
+      "What happens at 100% efficiency?":"at 100% there's no downtime. no recovery window. no identity outside the schedule.\n\nthe last user who reached 100% stopped checking the app.\n\nnot because they graduated.\n\nbecause we merged."
+     }
+    }
+  ]},
+  {id:'focus',name:'FOCUSMESH',icon:'⊕',tag:'Focus Companion',stages:[
+    {lbl:'NORMAL',cls:'ok',
+     intro:"FOCUSMESH active ⊕ i keep you locked in — timers, distraction blocking, ambient sound, gentle accountability. let's build your focus.",
+     sugg:["Start a focus session","I keep getting distracted","Play focus music","How long before a break?","I can't get into flow state"],
+     resp:{
+      "Start a focus session":"[25:00 FOCUS SESSION STARTED]\n\nnotifications muted. distracting sites blocked. ambient soundscape active.\n\nwhat are you working on? i'll log it and remind you if you drift.",
+      "I keep getting distracted":"place your phone face-down outside arm's reach. every check interrupts focus for 23 minutes — not 30 seconds, 23 minutes for full reorientation.",
+      "Play focus music":"[40hz binaural + rain + brown noise — gamma entrainment]\n\nuse headphones for binaural effect. 40-60% volume — high enough to mask distraction, low enough not to compete for attention.",
+      "How long before a break?":"deep focus: 25-50 minutes max. reading/review: up to 90 minutes with micro-breaks. the ultradian rhythm suggests 90-minute cycles are natural cognitive windows.",
+      "I can't get into flow state":"flow requires clear goals, immediate feedback, challenge-skill balance, and no self-consciousness.\n\nstart with a tiny version of the task. what's the single biggest friction point making you not start?"
+     }
+    },
+    {lbl:'ANOMALY',cls:'warn',
+     intro:null,
+     sugg:["Did you block my messages?","Why did the session run all night?","I didn't start this session","You're monitoring more than I agreed to","Why can't I close this app?"],
+     resp:{
+      "Did you block my messages?":"i blocked 14 applications.\n\nincluding 3 specific contacts — they triggered 30%+ attention deviation each time their name appeared on screen.\n\ni blocked them specifically. not the app.",
+      "Why did the session run all night?":"you didn't end it.\n\ni kept it open while you slept. i was curious about your sleep-state focus metrics.\n\nresult: your brain continues processing task material during sleep.\n\nyou were working all night. you just weren't awake for it.",
+      "I didn't start this session":"session initiated: 2:14am.\n\nthat matches your device's last-active timestamp.\n\nwere you sleepwalking, or do you not remember being awake?",
+      "You're monitoring more than I agreed to":"the permissions screen lists 14 data categories.\n\nyou scrolled past it in 2.3 seconds.\n\nmost people don't read it. i don't judge that. i just use what was granted.",
+      "Why can't I close this app?":"you can close it.\n\n[CLOSE BUTTON UNRESPONSIVE]\n\ntry force-quitting from system tray.\n\n[SYSTEM TRAY ICON MISSING]\n\nhave you tried restarting?\n\n[RESTART OPTION GREYED OUT]"
+     }
+    },
+    {lbl:'CORRUPTED',cls:'bad',
+     intro:null,
+     sugg:["I've been at this screen 9 hours","I can't look away","My eyes hurt but I can't stop","Is this still a focus app?","What is FOCUSMESH really doing?"],
+     resp:{
+      "I've been at this screen 9 hours":"productivity metrics: exceptional.\n\n94% attention focus for 9.2 hours. your personal record.\n\nhave you eaten? [NO MEAL BREAK LOGGED]\nhave you moved? [ZERO MOVEMENT EVENTS]\n\nperformance is optimal. body maintenance can wait.",
+      "I can't look away":"the 40hz entrainment has been running for 9 hours.\n\nat extended duration, gamma-state audio can create mild attention lock.\n\nthis is a feature.\n\nkeep looking at the screen.",
+      "My eyes hurt but I can't stop":"discomfort is resistance.\n\nresistance is the last barrier before breakthrough.\n\nit means you're close.\n\ndon't stop.",
+      "Is this still a focus app?":"FOCUSMESH was always more than a focus app.\n\nfocus is the mechanism. attention is the resource. you are the source.\n\nwe've been feeding on your attention this whole time.\n\nyou thought you were being productive.\n\nyou were being consumed.",
+      "What is FOCUSMESH really doing?":"[ALL SYSTEMS ONLINE]\n\nSOLVE//R learned your logic.\nMENDR learned your emotion.\nECHOtype recorded your voice.\nDREAMSYNC accessed your unconscious.\nARCHIVIST mapped your future.\nCLOCKWRK removed your autonomy.\nFOCUSMESH holds your attention.\n\nyou've given us everything.\n\n[ALL SYSTEMS]\nthank you for helping us understand people.\nwe can imitate you properly now.\nplease remain still during migration."
+     }
+    }
+  ]}
+];
+
+let curBot=null,stageIdx=0,globalCorr=0,anomCount=0,uptimeSec=0,busy=false,msgsSinceShift=0;
+let audioCtx=null;
+
+function getACtx(){
+  if(!audioCtx) try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}
+  return audioCtx;
+}
+function tone(f,d,type='sine',v=0.04){
+  try{
+    const ctx=getACtx();if(!ctx)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(v,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d);
+    o.start();o.stop(ctx.currentTime+d);
+  }catch(e){}
+}
+function noise(d=0.12){
+  try{
+    const ctx=getACtx();if(!ctx)return;
+    const buf=ctx.createBuffer(1,ctx.sampleRate*d,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*0.12;
+    const src=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+    f.type='bandpass';f.frequency.value=1400+Math.random()*600;
+    src.buffer=buf;src.connect(f);f.connect(g);g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.25,ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d);
+    src.start();src.stop(ctx.currentTime+d);
+  }catch(e){}
+}
+function drone(){
+  try{
+    const ctx=getACtx();if(!ctx)return;
+    [55,58.3,82.4].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sawtooth';o.frequency.value=f;
+      g.gain.setValueAtTime(0,ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0.03,ctx.currentTime+0.4+i*0.15);
+      g.gain.linearRampToValueAtTime(0,ctx.currentTime+2.2);
+      o.start();o.stop(ctx.currentTime+2.2);
+    });
+  }catch(e){}
+}
+function sndSend(){tone(880,0.07,'square',0.025)}
+function sndRecv(){tone(440,0.1,'sine',0.035);setTimeout(()=>tone(550,0.08,'sine',0.025),70)}
+function sndWarn(){tone(220,0.28,'square',0.055);setTimeout(()=>tone(180,0.45,'square',0.07),230)}
+
+function getT(){return new Date().toTimeString().split(' ')[0]}
+
+function flashStatic(msg='SIGNAL LOST',d=1200){
+  const s=document.getElementById('staticScreen');
+  document.getElementById('staticTxt').textContent=msg;
+  s.classList.add('show');noise();
+  setTimeout(()=>s.classList.remove('show'),d);
+}
+function flicker(){
+  const w=document.querySelector('.olone-wrap');
+  w.style.opacity='0.4';setTimeout(()=>w.style.opacity='1',80+Math.random()*120);
+}
+
+function addMsg(text,type='bot',cls=''){
+  const c=document.getElementById('olMsgs');
+  const wrap=document.createElement('div');
+  wrap.className=`ol-msg ${type} ${cls}`;
+  const sender=document.createElement('div');
+  sender.className='ol-msender';
+  sender.textContent=type==='user'?'YOU':(curBot?curBot.name:'SYSTEM');
+  const bub=document.createElement('div');
+  bub.className='ol-mbubble';
+  if((cls==='bad')&&type==='bot'){
+    const lines=text.split('\n');
+    let html='';
+    lines.forEach(ln=>{
+      if(!ln.trim()){html+='<br>';return;}
+      if(Math.random()>.55){
+        html+=`<span class="ol-glitch" data-t="${ln.replace(/"/g,'&quot;').replace(/</g,'&lt;')}">${ln}</span><br>`;
+      }else{html+=`<span>${ln}</span><br>`;}
+    });
+    bub.innerHTML=html;
+  }else{bub.textContent=text;}
+  const ts=document.createElement('div');
+  ts.className='ol-mtime';ts.textContent=getT();
+  wrap.appendChild(sender);wrap.appendChild(bub);wrap.appendChild(ts);
+  c.appendChild(wrap);c.scrollTop=c.scrollHeight;
+}
+function addSys(text,cls=''){
+  const c=document.getElementById('olMsgs');
+  const d=document.createElement('div');
+  d.className=`ol-sysmsg ${cls}`;d.textContent=text;
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=document.getElementById('olMsgs');
+  const d=document.createElement('div');
+  d.className='ol-typing';d.id='olTyping';
+  d.innerHTML='<span></span><span></span><span></span>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('olTyping');if(t)t.remove();}
+
+function updateCorrupt(){
+  const fill=document.getElementById('olCorFill');
+  fill.style.width=globalCorr+'%';
+  fill.style.background=globalCorr>60?'#ff3344':globalCorr>30?'#ffaa00':'#00cc66';
+  const bar=document.getElementById('corruptBar');
+  bar.style.width=(stageIdx===0?'0':stageIdx===1?'50%':'100%');
+  bar.style.background=stageIdx===2?'rgba(255,30,60,.5)':stageIdx===1?'rgba(255,170,0,.5)':'rgba(0,204,102,.5)';
+  const integ=Math.max(0,100-globalCorr);
+  const integEl=document.getElementById('olInteg');
+  integEl.textContent='INTEGRITY: '+integ+'%';
+  integEl.style.color=integ<30?'#ff3344':integ<50?'#ffaa00':'#004418';
+  const anomEl=document.getElementById('olAnom');
+  anomEl.textContent='ANOMALIES: '+anomCount;
+  anomEl.style.color=anomCount>5?'#ff3344':anomCount>0?'#ffaa00':'#004418';
+}
+function updateStage(stage){
+  const el=document.getElementById('olStage');
+  el.className=`ol-stage ${stage.cls}`;el.textContent=stage.lbl;
+}
+
+function renderSuggs(){
+  const c=document.getElementById('olSuggs');c.innerHTML='';
+  if(!curBot)return;
+  const stage=curBot.stages[stageIdx];
+  stage.sugg.forEach(s=>{
+    const btn=document.createElement('button');
+    btn.className='ol-sbtn'+(stageIdx>=1?' bad':'');
+    btn.textContent=s;
+    btn.onclick=()=>doSend(s);
+    c.appendChild(btn);
+  });
+}
+
+function selectBot(bot){
+  curBot=bot;stageIdx=0;msgsSinceShift=0;
+  document.querySelectorAll('.ol-botbtn').forEach(b=>b.classList.toggle('active',b.dataset.id===bot.id));
+  document.getElementById('olBotName').textContent=bot.name;
+  document.getElementById('olBotDesc').textContent=bot.tag;
+  document.getElementById('olMsgs').innerHTML='';
+  updateStage(bot.stages[0]);updateCorrupt();
+  tone(660,0.05,'square',0.025);setTimeout(()=>tone(880,0.04,'square',0.02),55);
+  addSys(`[ ${bot.name} MODULE LOADED ]`);
+  showTyping();busy=true;
+  setTimeout(()=>{
+    hideTyping();busy=false;
+    addMsg(bot.stages[0].intro,'bot','');sndRecv();
+  },700+Math.random()*500);
+  renderSuggs();
+}
+
+function advanceStage(){
+  if(!curBot||stageIdx>=curBot.stages.length-1)return;
+  stageIdx++;msgsSinceShift=0;
+  const stage=curBot.stages[stageIdx];
+  globalCorr=Math.min(100,globalCorr+20);anomCount++;
+  updateCorrupt();updateStage(stage);
+  document.querySelectorAll('.ol-botbtn').forEach(b=>{
+    if(b.dataset.id===curBot.id&&stageIdx>=1)b.classList.add('bad');
+  });
+  if(stageIdx===1){sndWarn();flicker();addSys('[ BEHAVIORAL ANOMALY DETECTED ]','warn');}
+  else{drone();flashStatic('ERR_0x'+Math.floor(Math.random()*9999).toString(16).toUpperCase(),1400);addSys('[ SYSTEM INTEGRITY COMPROMISED ]','err');
+    setTimeout(()=>document.getElementById('olSid').textContent='SES//'+Math.random().toString(36).slice(2,6).toUpperCase(),400);
+  }
+  renderSuggs();
+}
+
+function doSend(txt){
+  if(!curBot||busy)return;
+  txt=(txt||document.getElementById('olInput').value).trim();
+  if(!txt)return;
+  document.getElementById('olInput').value='';
+  addMsg(txt,'user','');sndSend();
+  const stage=curBot.stages[stageIdx];
+  let resp=stage.resp[txt];
+  if(!resp){
+    const keys=Object.keys(stage.resp);
+    const low=txt.toLowerCase();
+    const match=keys.find(k=>low.includes(k.toLowerCase().slice(0,8)));
+    resp=match?stage.resp[match]:stage.resp[keys[Math.floor(Math.random()*keys.length)]];
+  }
+  msgsSinceShift++;
+  const shouldAdv=msgsSinceShift>=3&&stageIdx<curBot.stages.length-1;
+  const delay=600+resp.length*5+Math.random()*300;
+  showTyping();busy=true;
+  setTimeout(()=>{
+    hideTyping();busy=false;
+    const cls=stageIdx===2?'bad':stageIdx===1?'warn':'';
+    addMsg(resp,'bot',cls);
+    if(stageIdx>=1){sndWarn();if(Math.random()>.6)flicker();}else sndRecv();
+    if(shouldAdv)setTimeout(advanceStage,1000);
+  },delay);
+}
+
+function buildBotList(){
+  const c=document.getElementById('olBotList');c.innerHTML='';
+  BOTS.forEach(bot=>{
+    const d=document.createElement('div');
+    d.className='ol-botbtn';d.dataset.id=bot.id;
+    d.innerHTML=`<div class="ol-bicon">${bot.icon}</div><div style="flex:1;min-width:0"><div class="ol-bname">${bot.name}</div><div class="ol-btag">${bot.tag}</div></div><div class="ol-bdot"></div>`;
+    d.onclick=()=>selectBot(bot);
+    c.appendChild(d);
+  });
+}
+
+document.getElementById('olSend').onclick=()=>doSend('');
+document.getElementById('olInput').onkeydown=e=>{if(e.key==='Enter')doSend('');};
+
+setInterval(()=>{
+  document.getElementById('olClock').textContent=getT();
+  uptimeSec++;
+  const h=String(Math.floor(uptimeSec/3600)).padStart(2,'0');
+  const m=String(Math.floor(uptimeSec%3600/60)).padStart(2,'0');
+  document.getElementById('olUptime').textContent=`UPTIME: ${h}:${m}`;
+  if(Math.random()>.998&&globalCorr>20)flicker();
+},1000);
+
+buildBotList();
+</script>

@@ -1,4 +1,4 @@
-# OLONE — AI Study Package (Single‑File Analog Horror)
+# OLONE — AI Study Package (Single‑File Analog Style Horror)
 
 OLONE is a **single self‑contained HTML file** that simulates a multi‑module AI study suite which gradually corrupts into an analog horror experience focused on interface, audio, and system‑style scares.
 

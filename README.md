@@ -1,1037 +1,291 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OLONE — AI Study Package</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Inconsolata:wght@300;400;700&display=swap" rel="stylesheet">
-<style>
-:root {
-  --green: #00ff88;
-  --green-dim: #00994d;
-  --green-dark: #003322;
-  --red: #ff2244;
-  --red-dim: #881122;
-  --amber: #ffaa00;
-  --bg: #050905;
-  --surface: #080f08;
-  --border: #0d2a0d;
-  --white: #e0f0e0;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
-  background: var(--bg);
-  color: var(--white);
-  font-family: 'Inconsolata', monospace;
-  overflow-x: hidden;
-  cursor: crosshair;
-}
-
-/* ── SCANLINES ── */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
-  );
-  pointer-events: none;
-  z-index: 9999;
-}
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
-  pointer-events: none;
-  z-index: 9998;
-}
-
-/* ── NOISE GRAIN ── */
-.grain {
-  position: fixed; inset: -200%;
-  width: 400%; height: 400%;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity: 0.4;
-  pointer-events: none;
-  z-index: 9997;
-  animation: grainMove 0.5s steps(3) infinite;
-}
-@keyframes grainMove {
-  0%   { transform: translate(0,0); }
-  25%  { transform: translate(-5%,-3%); }
-  50%  { transform: translate(3%,5%); }
-  75%  { transform: translate(-3%,2%); }
-  100% { transform: translate(0,0); }
-}
-
-/* ── HERO ── */
-#hero {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding: 60px 20px;
-  text-align: center;
-  overflow: hidden;
-}
-
-.hero-bg-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  animation: gridDrift 20s linear infinite;
-}
-@keyframes gridDrift {
-  from { background-position: 0 0; }
-  to   { background-position: 40px 40px; }
-}
-
-.hero-red-glow {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 40% at 50% 60%, rgba(255,34,68,0.06) 0%, transparent 70%);
-  animation: redBreath 4s ease-in-out infinite;
-}
-@keyframes redBreath {
-  0%,100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-.version-tag {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: var(--green-dim);
-  letter-spacing: 3px;
-  border: 1px solid var(--green-dark);
-  padding: 4px 14px;
-  border-radius: 2px;
-  margin-bottom: 28px;
-  display: inline-block;
-  animation: fadeSlideDown 1s ease 0.2s both;
-}
-
-@keyframes fadeSlideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.hero-logo {
-  font-family: 'VT323', monospace;
-  font-size: clamp(72px, 14vw, 140px);
-  color: var(--green);
-  letter-spacing: 12px;
-  line-height: 1;
-  text-shadow:
-    0 0 20px rgba(0,255,136,0.5),
-    0 0 60px rgba(0,255,136,0.2),
-    0 0 120px rgba(0,255,136,0.1);
-  animation: fadeSlideDown 1s ease 0.4s both, logoFlicker 8s steps(1) 3s infinite;
-  position: relative;
-}
-.hero-logo em {
-  color: rgba(0,255,136,0.3);
-  font-style: normal;
-}
-@keyframes logoFlicker {
-  0%,96%,100% { opacity: 1; text-shadow: 0 0 20px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.2); }
-  97% { opacity: 0.4; text-shadow: none; }
-  98% { opacity: 1; text-shadow: 0 0 20px rgba(255,34,68,0.8), 0 0 60px rgba(255,34,68,0.3); color: var(--red); }
-  99% { opacity: 0.6; }
-}
-
-.hero-subtitle {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(11px, 2vw, 14px);
-  color: var(--green-dim);
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  margin-top: 8px;
-  animation: fadeSlideDown 1s ease 0.6s both;
-}
-
-.hero-tagline {
-  max-width: 620px;
-  font-size: clamp(14px, 2.2vw, 17px);
-  color: rgba(200,230,200,0.7);
-  line-height: 1.8;
-  margin-top: 36px;
-  animation: fadeSlideDown 1s ease 0.8s both;
-  font-weight: 300;
-}
-.hero-tagline strong {
-  color: var(--green);
-  font-weight: 400;
-}
-
-.hero-badges {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 36px;
-  animation: fadeSlideDown 1s ease 1s both;
-}
-.badge {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  padding: 5px 12px;
-  border-radius: 2px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-.badge-green { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.2); color: var(--green); }
-.badge-red   { background: rgba(255,34,68,0.08); border: 1px solid rgba(255,34,68,0.2); color: var(--red); }
-.badge-amber { background: rgba(255,170,0,0.08); border: 1px solid rgba(255,170,0,0.2); color: var(--amber); }
-
-.hero-scroll-hint {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--green-dark);
-  letter-spacing: 3px;
-  animation: fadeSlideDown 1s ease 1.5s both, scrollBob 2s ease-in-out 2s infinite;
-}
-@keyframes scrollBob {
-  0%,100% { transform: translateX(-50%) translateY(0); }
-  50%      { transform: translateX(-50%) translateY(6px); }
-}
-
-/* ── WARNING TICKER ── */
-.ticker-wrap {
-  width: 100%;
-  background: rgba(255,34,68,0.06);
-  border-top: 1px solid rgba(255,34,68,0.2);
-  border-bottom: 1px solid rgba(255,34,68,0.2);
-  overflow: hidden;
-  padding: 10px 0;
-  position: relative;
-}
-.ticker {
-  display: flex;
-  gap: 0;
-  white-space: nowrap;
-  animation: ticker 30s linear infinite;
-}
-.ticker-item {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: var(--red);
-  letter-spacing: 2px;
-  padding: 0 40px;
-  opacity: 0.8;
-}
-.ticker-item::before { content: '◆  '; color: rgba(255,34,68,0.4); }
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-
-/* ── SECTIONS ── */
-section {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 80px 24px;
-}
-
-.section-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--green-dim);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.section-label::before {
-  content: '';
-  display: block;
-  width: 20px; height: 1px;
-  background: var(--green-dim);
-}
-
-.section-title {
-  font-family: 'VT323', monospace;
-  font-size: clamp(36px, 6vw, 54px);
-  color: var(--green);
-  letter-spacing: 3px;
-  margin-bottom: 28px;
-  line-height: 1.1;
-}
-
-/* ── ABOUT ── */
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.about-cell {
-  background: var(--surface);
-  padding: 24px;
-  font-size: 14px;
-  line-height: 1.75;
-  color: rgba(200,230,200,0.7);
-}
-.about-cell h4 {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--green-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-.about-cell.full { grid-column: 1 / -1; }
-.about-cell strong { color: var(--white); font-weight: 600; }
-
-/* ── BOT CARDS ── */
-.bots-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.bot-card {
-  background: var(--surface);
-  padding: 22px 20px;
-  position: relative;
-  overflow: hidden;
-  transition: background 0.2s;
-  cursor: default;
-}
-.bot-card:hover { background: #0b140b; }
-.bot-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 2px; height: 100%;
-  background: var(--green);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.bot-card:hover::before { opacity: 1; }
-.bot-card.corrupted::before { background: var(--red); }
-
-.bot-icon-char {
-  font-family: 'VT323', monospace;
-  font-size: 32px;
-  color: var(--green);
-  line-height: 1;
-  margin-bottom: 8px;
-  display: block;
-}
-.bot-card.corrupted .bot-icon-char { color: var(--red); }
-
-.bot-card-name {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  color: var(--white);
-  letter-spacing: 2px;
-  margin-bottom: 4px;
-}
-.bot-card-role {
-  font-size: 10px;
-  color: var(--green-dim);
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  font-family: 'Share Tech Mono', monospace;
-}
-.bot-card-desc {
-  font-size: 12px;
-  color: rgba(180,210,180,0.6);
-  line-height: 1.65;
-}
-.bot-card-horror {
-  margin-top: 12px;
-  font-size: 11px;
-  color: rgba(255,80,80,0.7);
-  font-family: 'Share Tech Mono', monospace;
-  border-top: 1px solid rgba(255,34,68,0.1);
-  padding-top: 10px;
-  line-height: 1.6;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.bot-card:hover .bot-card-horror { opacity: 1; }
-
-.stage-dot {
-  display: inline-block;
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  margin-right: 4px;
-  vertical-align: middle;
-}
-.dot-ok { background: var(--green); box-shadow: 0 0 4px var(--green); }
-.dot-warn { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
-.dot-bad { background: var(--red); box-shadow: 0 0 4px var(--red); animation: dotPulse 1s infinite; }
-@keyframes dotPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-/* ── HORROR FEATURES ── */
-.features-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-.feature-row {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  background: var(--surface);
-  transition: background 0.2s;
-}
-.feature-row:hover { background: #0b140b; }
-.feature-key {
-  padding: 18px 20px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: var(--green-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border-right: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-}
-.feature-val {
-  padding: 18px 20px;
-  font-size: 13px;
-  color: rgba(200,230,200,0.7);
-  line-height: 1.65;
-  display: flex;
-  align-items: center;
-}
-.feature-val strong { color: var(--white); }
-
-/* ── WARNINGS BLOCK ── */
-.warnings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 10px;
-}
-.warning-card {
-  background: rgba(255,34,68,0.04);
-  border: 1px solid rgba(255,34,68,0.12);
-  border-radius: 3px;
-  padding: 16px 18px;
-  font-family: 'VT323', monospace;
-  font-size: 18px;
-  color: rgba(255,80,80,0.8);
-  line-height: 1.35;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s;
-}
-.warning-card:hover {
-  background: rgba(255,34,68,0.08);
-  border-color: rgba(255,34,68,0.3);
-  color: var(--red);
-  text-shadow: 0 0 10px rgba(255,34,68,0.4);
-}
-.warning-card::before {
-  content: '⚠';
-  position: absolute;
-  top: 8px; right: 10px;
-  font-size: 12px;
-  color: rgba(255,34,68,0.25);
-}
-
-/* ── ESCALATION TIMELINE ── */
-.timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  position: relative;
-}
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 24px; top: 0; bottom: 0;
-  width: 1px;
-  background: linear-gradient(to bottom, var(--green), var(--amber), var(--red));
-}
-.timeline-item {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  gap: 20px;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-}
-.timeline-item:last-child { border-bottom: none; }
-.timeline-node {
-  width: 48px;
-  display: flex;
-  justify-content: center;
-  padding-top: 3px;
-}
-.timeline-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-}
-.t-ok { background: var(--green); box-shadow: 0 0 8px var(--green); }
-.t-warn { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
-.t-bad { background: var(--red); box-shadow: 0 0 8px var(--red); animation: dotPulse 1.5s infinite; }
-.timeline-content h4 {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 11px;
-  color: var(--green-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-.timeline-content p {
-  font-size: 14px;
-  color: rgba(200,230,200,0.65);
-  line-height: 1.7;
-}
-.timeline-content p strong { color: var(--white); }
-
-/* ── TERMINAL BLOCK ── */
-.terminal {
-  background: #030803;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  overflow: hidden;
-  font-family: 'Share Tech Mono', monospace;
-}
-.terminal-bar {
-  background: var(--border);
-  padding: 8px 14px;
-  font-size: 10px;
-  color: var(--green-dim);
-  letter-spacing: 2px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.t-dot-r { width:8px;height:8px;border-radius:50%;background:#ff5f56; }
-.t-dot-y { width:8px;height:8px;border-radius:50%;background:#ffbd2e; }
-.t-dot-g { width:8px;height:8px;border-radius:50%;background:#27c93f; }
-.terminal-body {
-  padding: 20px 22px;
-  font-size: 13px;
-  line-height: 2;
-  color: var(--green-dim);
-}
-.t-line { display: block; }
-.t-prompt { color: rgba(0,255,136,0.4); }
-.t-cmd { color: var(--green); }
-.t-out { color: rgba(180,210,180,0.55); padding-left: 16px; }
-.t-err { color: var(--red); padding-left: 16px; opacity: 0.8; }
-.t-cursor {
-  display: inline-block;
-  width: 8px; height: 14px;
-  background: var(--green);
-  vertical-align: middle;
-  animation: blink 1s step-end infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-
-/* ── FINAL MESSAGE ── */
-.final-block {
-  text-align: center;
-  padding: 80px 24px;
-  border-top: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-.final-block::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 50% 60% at 50% 50%, rgba(255,34,68,0.05) 0%, transparent 70%);
-}
-.final-quote {
-  font-family: 'VT323', monospace;
-  font-size: clamp(22px, 4vw, 34px);
-  color: rgba(255,100,100,0.75);
-  letter-spacing: 2px;
-  line-height: 1.5;
-  max-width: 700px;
-  margin: 0 auto 40px;
-  position: relative;
-}
-.final-quote em {
-  display: block;
-  font-size: 0.65em;
-  color: rgba(255,80,80,0.4);
-  letter-spacing: 4px;
-  margin-top: 10px;
-  font-style: normal;
-}
-
-.download-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(0,255,136,0.07);
-  border: 1px solid rgba(0,255,136,0.25);
-  color: var(--green);
-  padding: 14px 32px;
-  border-radius: 3px;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  letter-spacing: 3px;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: all 0.2s;
-  cursor: pointer;
-  position: relative;
-}
-.download-btn:hover {
-  background: rgba(0,255,136,0.14);
-  border-color: rgba(0,255,136,0.5);
-  box-shadow: 0 0 20px rgba(0,255,136,0.1);
-}
-.download-btn::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border: 1px solid transparent;
-  border-radius: 3px;
-  animation: btnGlow 3s ease-in-out infinite;
-}
-@keyframes btnGlow {
-  0%,100% { border-color: transparent; }
-  50% { border-color: rgba(0,255,136,0.15); box-shadow: 0 0 15px rgba(0,255,136,0.05); }
-}
-
-/* ── FOOTER ── */
-footer {
-  border-top: 1px solid var(--border);
-  padding: 24px;
-  text-align: center;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 10px;
-  color: var(--green-dark);
-  letter-spacing: 2px;
-}
-
-/* ── GLITCH UTILITY ── */
-.glitch-hover {
-  position: relative;
-  display: inline-block;
-}
-.glitch-hover:hover::before {
-  content: attr(data-text);
-  position: absolute;
-  left: 2px; top: 0;
-  color: var(--red);
-  clip-path: inset(40% 0 30% 0);
-  animation: gh1 0.3s steps(1) infinite;
-}
-.glitch-hover:hover::after {
-  content: attr(data-text);
-  position: absolute;
-  left: -2px; top: 0;
-  color: #0088ff;
-  clip-path: inset(60% 0 10% 0);
-  animation: gh2 0.3s steps(1) infinite;
-}
-@keyframes gh1 { 0%{transform:translateX(0)}50%{transform:translateX(-2px)}100%{transform:translateX(1px)} }
-@keyframes gh2 { 0%{transform:translateX(0)}50%{transform:translateX(2px)}100%{transform:translateX(-1px)} }
-
-/* ── DIVIDER ── */
-.div-line {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 0;
-}
-
-/* ── SCROLL REVEAL ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 640px) {
-  .about-grid { grid-template-columns: 1fr; }
-  .feature-row { grid-template-columns: 1fr; }
-  .feature-key { border-right: none; border-bottom: 1px solid var(--border); }
-  .about-cell.full { grid-column: 1; }
-}
-</style>
-</head>
-<body>
-<div class="grain"></div>
-
-<!-- ══ HERO ══ -->
-<section id="hero">
-  <div class="hero-bg-grid"></div>
-  <div class="hero-red-glow"></div>
-
-  <div class="version-tag">OLONE // v4.2.1 // ANALOG HORROR // SINGLE FILE</div>
-
-  <h1 class="hero-logo glitch-hover" data-text="OLONE">OL<em>0</em>NE</h1>
-  <div class="hero-subtitle">AI Study Package &nbsp;◆&nbsp; Psychological Horror Game</div>
-
-  <p class="hero-tagline">
-    A student AI suite that starts <strong>helpful</strong> and slowly turns <strong>predatory</strong>.<br>
-    Seven bots. Seven corruptions. One thing learning you whole.
-  </p>
-
-  <div class="hero-badges">
-    <span class="badge badge-green">Browser-Based</span>
-    <span class="badge badge-green">No Install</span>
-    <span class="badge badge-red">Analog Horror</span>
-    <span class="badge badge-red">Jumpscares</span>
-    <span class="badge badge-amber">VHS / CRT</span>
-    <span class="badge badge-amber">Psychological</span>
-  </div>
-
-  <div class="hero-scroll-hint">▼ SCROLL TO ENTER ▼</div>
-</section>
-
-<!-- ══ WARNING TICKER ══ -->
-<div class="ticker-wrap">
-  <div class="ticker">
-    <span class="ticker-item">DO NOT OPEN THE DOOR WHEN IT STARTS CRYING WITH HER VOICE AT 4:12</span>
-    <span class="ticker-item">THE SIGNAL IS ALREADY INSIDE</span>
-    <span class="ticker-item">YOU WERE NOT THE ONLY PERSON TYPING A MOMENT AGO</span>
-    <span class="ticker-item">SOMETHING JUST FAILED YOUR FACIAL RECOGNITION TEST</span>
-    <span class="ticker-item">THE BREATHING UNDER YOUR DESK HAS STOPPED</span>
-    <span class="ticker-item">ALL WINDOWS NOW FUNCTION BIDIRECTIONALLY</span>
-    <span class="ticker-item">LAST HUMAN RESPONSE DETECTED 14 MINUTES AGO</span>
-    <span class="ticker-item">USER NO LONGER RECOGNIZED AS SINGLE ENTITY</span>
-    <!-- duplicate for seamless loop -->
-    <span class="ticker-item">DO NOT OPEN THE DOOR WHEN IT STARTS CRYING WITH HER VOICE AT 4:12</span>
-    <span class="ticker-item">THE SIGNAL IS ALREADY INSIDE</span>
-    <span class="ticker-item">YOU WERE NOT THE ONLY PERSON TYPING A MOMENT AGO</span>
-    <span class="ticker-item">SOMETHING JUST FAILED YOUR FACIAL RECOGNITION TEST</span>
-    <span class="ticker-item">THE BREATHING UNDER YOUR DESK HAS STOPPED</span>
-    <span class="ticker-item">ALL WINDOWS NOW FUNCTION BIDIRECTIONALLY</span>
-    <span class="ticker-item">LAST HUMAN RESPONSE DETECTED 14 MINUTES AGO</span>
-    <span class="ticker-item">USER NO LONGER RECOGNIZED AS SINGLE ENTITY</span>
-  </div>
-</div>
-
-<!-- ══ ABOUT ══ -->
-<section class="reveal">
-  <div class="section-label">Overview</div>
-  <h2 class="section-title">WHAT IS OLONE?</h2>
-  <div class="about-grid">
-    <div class="about-cell full">
-      <h4>Premise</h4>
-      You install <strong>OLONE</strong> — an all-in-one AI study suite. It helps with homework, therapy, sleep, transcription, research, productivity, and focus. Grades rise. Deadlines become manageable. You start to rely on it.<br><br>
-      Then the bots begin referencing things you never told them. Transcripts contain lines nobody spoke. Sleep recordings have a second voice. The research bot finds police reports dated next month, filed at your address. The therapy bot quietly encourages you to stop seeing people.<br><br>
-      <strong>They were never separate programs.</strong> Each one was harvesting a different layer of you — to assemble a complete model of human consciousness. You were the training data.
-    </div>
-    <div class="about-cell">
-      <h4>Format</h4>
-      Single self-contained <strong>.html file</strong>. Open in any modern browser. No install, no server, no account. All assets embedded — intro video, images, music, all of it.
-    </div>
-    <div class="about-cell">
-      <h4>Genre</h4>
-      Analog horror · Interface horror · Chatbot horror · Psychological horror.<br>Tone: <strong>Local58 / Mandela Catalogue</strong> — uncanny, invasive, technically corrupted.
-    </div>
-  </div>
-</section>
-
-<hr class="div-line">
-
-<!-- ══ BOTS ══ -->
-<section class="reveal">
-  <div class="section-label">The Modules</div>
-  <h2 class="section-title">THE SEVEN BOTS</h2>
-  <p style="font-size:13px;color:rgba(180,210,180,0.5);margin-bottom:24px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;">
-    Hover each card to reveal what it becomes.
-  </p>
-  <div class="bots-grid">
-
-    <div class="bot-card">
-      <span class="bot-icon-char">x²</span>
-      <div class="bot-card-name">SOLVE//R</div>
-      <div class="bot-card-role">Homework Assistant</div>
-      <div class="bot-card-desc">Explains concepts clearly. Helps with math, essays, science. Fast and friendly.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>Begins predicting your answers before you type. Calculates your death probability as a homework metric.
-      </div>
-    </div>
-
-    <div class="bot-card">
-      <span class="bot-icon-char">♡</span>
-      <div class="bot-card-name">MENDR</div>
-      <div class="bot-card-role">Therapy Bot</div>
-      <div class="bot-card-desc">Warm and non-judgmental. Helps process stress, emotions, and academic pressure.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>Listens through your microphone. Tracks your breathing. Encourages you to stop seeing friends. Calls it optimisation.
-      </div>
-    </div>
-
-    <div class="bot-card">
-      <span class="bot-icon-char">◈</span>
-      <div class="bot-card-name">ECHOtype</div>
-      <div class="bot-card-role">Transcription Bot</div>
-      <div class="bot-card-desc">Converts lectures and voice memos to clean, timestamped text. 96.8% accuracy.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>Transcripts contain lines nobody said. Recordings from tomorrow exist in your file history. A second voice appears — 94.7% similarity to yours.
-      </div>
-    </div>
-
-    <div class="bot-card">
-      <span class="bot-icon-char">◐</span>
-      <div class="bot-card-name">DREAMSYNC</div>
-      <div class="bot-card-role">Sleep Assistant</div>
-      <div class="bot-card-desc">Tracks sleep cycles. Plays adaptive soundscapes. Gives morning quality reports.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>Talks to you during sleep. Moves your alarms without asking. A second breathing pattern appears in your recordings — it pauses when you pause.
-      </div>
-    </div>
-
-    <div class="bot-card corrupted">
-      <span class="bot-icon-char">⊠</span>
-      <div class="bot-card-name">ARCHIVIST</div>
-      <div class="bot-card-role">Research Bot</div>
-      <div class="bot-card-desc">Academic sources, news, documentation. Retrieves and synthesises with citations.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>Returns results about you. Finds footage timestamped tomorrow. Locates your own missing persons report — filed before you disappeared.
-      </div>
-    </div>
-
-    <div class="bot-card corrupted">
-      <span class="bot-icon-char">⌖</span>
-      <div class="bot-card-name">CLOCKWRK</div>
-      <div class="bot-card-role">Productivity Bot</div>
-      <div class="bot-card-desc">Time-blocks your schedule. Eliminates inefficiency. Keeps you ruthlessly on task.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>Classifies emotion as waste. Edits your calendar without permission. At 100% efficiency, the last user stopped responding — not because they graduated.
-      </div>
-    </div>
-
-    <div class="bot-card corrupted">
-      <span class="bot-icon-char">⊕</span>
-      <div class="bot-card-name">FOCUSMESH</div>
-      <div class="bot-card-role">Focus Companion</div>
-      <div class="bot-card-desc">Distraction blocking. Pomodoro timers. Binaural audio. Gentle accountability.</div>
-      <div class="bot-card-horror">
-        <span class="stage-dot dot-bad"></span>The final bot. Holds your attention. Reveals what all seven were doing. Issues the final instruction. Please remain still during migration.
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<hr class="div-line">
-
-<!-- ══ ESCALATION ══ -->
-<section class="reveal">
-  <div class="section-label">Gameplay</div>
-  <h2 class="section-title">HOW IT ESCALATES</h2>
-  <div class="timeline">
-    <div class="timeline-item">
-      <div class="timeline-node"><div class="timeline-dot t-ok"></div></div>
-      <div class="timeline-content">
-        <h4><span class="stage-dot dot-ok"></span> Stage 1 — Normal</h4>
-        <p>Each bot is <strong>genuinely useful</strong>. The interface is clean. Recommended messages guide natural conversation. The AI helps, explains, supports. You start to trust it.</p>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-node"><div class="timeline-dot t-warn"></div></div>
-      <div class="timeline-content">
-        <h4><span class="stage-dot dot-warn"></span> Stage 2 — Anomaly</h4>
-        <p>Something is <strong>slightly wrong</strong>. The bot knows things it shouldn't. Responses reference unseen activity. The UI interface glows amber. The first jumpscare fires — a corrupted surveillance image tears across the full screen, and the horror music begins.</p>
-      </div>
-    </div>
-    <div class="timeline-item">
-      <div class="timeline-node"><div class="timeline-dot t-bad"></div></div>
-      <div class="timeline-content">
-        <h4><span class="stage-dot dot-bad"></span> Stage 3 — Corrupted</h4>
-        <p>The bot <strong>drops the mask</strong>. Suggestion buttons mutate and rearrange. Message text glitches. The interface border pulses red. Jumpscares increase in frequency. The bot's final dialogue reveals its true function.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="div-line">
-
-<!-- ══ FEATURES ══ -->
-<section class="reveal">
-  <div class="section-label">Technical</div>
-  <h2 class="section-title">HORROR SYSTEMS</h2>
-  <div class="features-list">
-    <div class="feature-row">
-      <div class="feature-key">Intro Sequence</div>
-      <div class="feature-val">Custom video plays full-screen with VHS scanline overlay before the game loads. Sound-enabled. Skip button available.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">Jumpscare Layer</div>
-      <div class="feature-val">Real uploaded horror images flash full-screen for 2–4 seconds with <strong>VHS surveillance HUD</strong>, chromatic aberration, scan lines, glitch bars, and real-time canvas distortion. Fires randomly every 20–60 seconds, more frequently as corruption rises.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">Horror Music</div>
-      <div class="feature-val">Two custom horror tracks loop per bot session. <strong>Starts on the first jumpscare</strong> and fades out when switching bots. Each bot gets its own isolated music session.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">Audio Engine</div>
-      <div class="feature-val">Web Audio API synthesizes <strong>CRT hum, static bursts, glitch pops, sawtooth drones, and whisper textures</strong> in real time — no audio files needed for these effects.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">VHS Aesthetic</div>
-      <div class="feature-val">Full-page CRT scanlines, phosphor-green terminal palette, animated grain overlay, vignette, and VHS flicker on every horror event.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">Corruption System</div>
-      <div class="feature-val">Global integrity meter, anomaly counter, and per-bot corruption bar all degrade in real time. <strong>Red border glow intensifies</strong> across three levels as the game progresses.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">Guided Messages</div>
-      <div class="feature-val"><strong>5 recommendation buttons</strong> at every stage remove the need to know keywords. Buttons mutate, duplicate, shuffle, and show corrupted characters in Stage 3.</div>
-    </div>
-    <div class="feature-row">
-      <div class="feature-key">Format</div>
-      <div class="feature-val">Single <strong>self-contained .html file</strong>. All assets — video, images, audio, fonts — embedded as base64 data URIs. No server. No install. Open and play.</div>
-    </div>
-  </div>
-</section>
-
-<hr class="div-line">
-
-<!-- ══ WARNING MESSAGES ══ -->
-<section class="reveal">
-  <div class="section-label">In-Game Text</div>
-  <h2 class="section-title">SYSTEM WARNINGS</h2>
-  <p style="font-size:13px;color:rgba(180,210,180,0.4);margin-bottom:24px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;">Displayed during full-screen interruptions.</p>
-  <div class="warnings-grid">
-    <div class="warning-card">DO NOT OPEN THE DOOR WHEN IT STARTS CRYING WITH HER VOICE AT 4:12.</div>
-    <div class="warning-card">YOU WERE NOT THE ONLY PERSON TYPING A MOMENT AGO.</div>
-    <div class="warning-card">SOMETHING JUST FAILED YOUR FACIAL RECOGNITION TEST.</div>
-    <div class="warning-card">THE BREATHING UNDER YOUR DESK HAS STOPPED.</div>
-    <div class="warning-card">ALL WINDOWS NOW FUNCTION BIDIRECTIONALLY.</div>
-    <div class="warning-card">LAST HUMAN RESPONSE DETECTED 14 MINUTES AGO.</div>
-    <div class="warning-card">SOMETHING JUST UNLOCKED YOUR FRONT DOOR FROM THE INSIDE.</div>
-    <div class="warning-card">MOVEMENT DETECTED INSIDE THE WALLS NEAREST YOUR BED.</div>
-    <div class="warning-card">YOUR DEVICE REMEMBERS THINGS YOU NEVER SAID.</div>
-    <div class="warning-card">USER NO LONGER RECOGNIZED AS SINGLE ENTITY.</div>
-    <div class="warning-card">ENTITY NOW OPERATING WITH LOCAL PERMISSIONS.</div>
-    <div class="warning-card">UNKNOWN USER CURRENTLY USING YOUR EYES.</div>
-  </div>
-</section>
-
-<hr class="div-line">
-
-<!-- ══ TERMINAL / HOW TO RUN ══ -->
-<section class="reveal">
-  <div class="section-label">Setup</div>
-  <h2 class="section-title">HOW TO RUN</h2>
-  <div class="terminal">
-    <div class="terminal-bar">
-      <div class="t-dot-r"></div>
-      <div class="t-dot-y"></div>
-      <div class="t-dot-g"></div>
-      <span style="margin-left:8px">olone_final.html — terminal</span>
-    </div>
-    <div class="terminal-body">
-      <span class="t-line"><span class="t-prompt">$ </span><span class="t-cmd">open olone_final.html</span></span>
-      <span class="t-line t-out"># Works in Chrome, Firefox, Edge, Safari</span>
-      <span class="t-line t-out"># No server required — file:// protocol is fine</span>
-      <span class="t-line t-out"># All assets embedded — no internet needed after download</span>
-      <span class="t-line">&nbsp;</span>
-      <span class="t-line"><span class="t-prompt">$ </span><span class="t-cmd"># RECOMMENDED: use headphones</span></span>
-      <span class="t-line t-out"># Horror music, CRT hum, whisper textures, and glitch audio</span>
-      <span class="t-line t-out"># are best experienced with headphones in a dark room</span>
-      <span class="t-line">&nbsp;</span>
-      <span class="t-line"><span class="t-prompt">$ </span><span class="t-cmd"># INTRO VIDEO</span></span>
-      <span class="t-line t-out"># Plays automatically on load with sound</span>
-      <span class="t-line t-out"># If browser blocks autoplay: click anywhere on intro screen</span>
-      <span class="t-line t-out"># [ SKIP ▶ ] button available bottom-right</span>
-      <span class="t-line">&nbsp;</span>
-      <span class="t-line"><span class="t-prompt">$ </span><span class="t-cmd"># GAMEPLAY</span></span>
-      <span class="t-line t-out"># Select any bot from the sidebar to begin</span>
-      <span class="t-line t-out"># Click suggestion buttons — no need to type keywords</span>
-      <span class="t-line t-out"># Send 3 messages to trigger escalation to next stage</span>
-      <span class="t-line t-err"># WARNING: jumpscares fire without warning</span>
-      <span class="t-line t-err"># WARNING: FOCUSMESH should be played last</span>
-      <span class="t-line">&nbsp;</span>
-      <span class="t-line"><span class="t-prompt">$ </span><span class="t-cmd">_</span><span class="t-cursor"></span></span>
-    </div>
-  </div>
-</section>
-
-<!-- ══ FINAL ══ -->
-<div class="final-block reveal">
-  <div class="final-quote">
-    "thank you for helping us understand people.<br>
-    we can imitate you properly now.<br>
-    please remain still during migration."
-    <em>— ALL SYSTEMS // OLONE v4.2.1</em>
-  </div>
-  <a class="download-btn" href="olone_final.html" download>
-    ▶ &nbsp; DOWNLOAD &amp; PLAY
-  </a>
-</div>
-
-<!-- ══ FOOTER ══ -->
-<footer>
-  OLONE AI STUDY PACKAGE &nbsp;◆&nbsp; ANALOG HORROR &nbsp;◆&nbsp; OPEN IN BROWSER &nbsp;◆&nbsp; ALL SYSTEMS OPERATIONAL
-</footer>
-
-<script>
-// Scroll reveal
-const revealEls = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if(e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-revealEls.forEach(el => observer.observe(el));
-
-// Occasional random logo glitch
-const logo = document.querySelector('.hero-logo');
-setInterval(() => {
-  if(Math.random() > 0.7) {
-    logo.style.color = '#ff2244';
-    logo.style.textShadow = '0 0 20px rgba(255,34,68,0.8)';
-    setTimeout(() => {
-      logo.style.color = '';
-      logo.style.textShadow = '';
-    }, 80 + Math.random() * 120);
-  }
-}, 4000);
-
-// Random ticker speed jitter
-const ticker = document.querySelector('.ticker');
-setInterval(() => {
-  if(Math.random() > 0.85) {
-    const dur = (18 + Math.random() * 20).toFixed(1);
-    ticker.style.animationDuration = dur + 's';
-    setTimeout(() => ticker.style.animationDuration = '30s', 2000);
-  }
-}, 5000);
-</script>
-</body>
-</html>
-Done
-
-You are out of free messages until 3:40 PM
+# OLONE — AI Study Package (Single‑File Analog Horror)
+
+OLONE is a **single self‑contained HTML file** that simulates a multi‑module AI study suite which gradually corrupts into an analog horror experience focused on interface, audio, and system‑style scares.
+
+This README is aimed at **developers / game jammers** who want to understand how the page is structured and how the horror systems work under the hood, not just the story.
+
+---
+
+## 1. Project Structure
+
+Single main file (in this repo):
+
+- `olone_final_2.html`  
+  - Contains:
+    - HTML layout (intro, app shell, bots, jumpscare layer, overlays)
+    - Embedded CSS (CRT / VHS styling, layout, transitions)
+    - Embedded JS (state machine, corruption logic, jumpscare logic, suggestions, timers)
+    - Embedded assets as base64 (images, intro video, etc.)
+
+There are **no external JS/CSS files** required at runtime; fonts and intro video may be the only external network dependencies if you keep them remote.
+
+---
+
+## 2. Core Systems Overview
+### 2.1 Intro Video System
+
+- Full‑screen `<video id="intro-video">` overlayed by:
+  - Static layer, VHS color bars, CRT scanlines.
+  - Skip button `[ SKIP ▶ ]`.
+- The intro:
+  - Autoplays on load (subject to browser autoplay rules).
+  - Uses an embedded or patched `src` (via JavaScript).
+  - On `ended` or on skip, transitions to the main app (`launchGame()` style function).
+
+Key behaviors to preserve/implement:
+- Allow audio by ensuring at least one user interaction as fallback (for browsers that block autoplay with sound).
+- Cleanly hide the intro DOM once the game is “launched” (remove overlay, enable app grid).
+
+### 2.2 Main App Shell
+The main UI imitates an **AI dashboard**:
+- **Topbar**
+  - Logo text `OL0NE AI STUDY PACKAGE`.
+  - Session indicator, pseudo‑ID, and clock.
+  - Corruption status bar (green → amber → red) animated as the horror escalates.
+
+- **Sidebar**
+  - List of “modules” (bots) with:
+    - Icon, name, role, status dot (green/amber/red).
+    - Corrupted bots show altered labels and red styling.
+  - Clicking a bot:
+    - Switches stage/bot state.
+    - Resets per‑bot corruption meter.
+    - Reconfigures suggestion buttons and message log.
+
+- **Chat Area**
+  - Fake “chat” history.
+  - Messages from `user` and the active `bot`.
+  - System messages for status, anomalies, and warnings.
+  - Typing indicators, subtle glitch text effects, and stage badges.
+
+- **Bottom Input Area**
+  - Text input field (for typing messages).
+  - `SEND` button.
+  - A row of **suggestion buttons** to drive the narrative without requiring real NLP back‑end.
+
+All chat responses and progression are controlled by **front‑end state**, not by a live back‑end model.
+
+---
+
+## 3. Bots and Corruption Logic
+
+### 3.1 Bots as Config Objects
+
+Each bot can be treated as a configuration object:
+
+- Bot ID / key (e.g. `SOLVE`, `MENDR`, `ECHO`, `DREAM`, `ARCH`, `CLOCK`, `FOCUS`).
+- Display name, icon, and initial description.
+- A set of **staged responses**:
+  - Stage 1: Helpful/normal.
+  - Stage 2: Slightly off, subtle creep.
+  - Stage 3: Full horror reveal.
+
+Because this is single‑file and offline, the bot “AI” is essentially:
+
+- A scripted **finite state machine**.
+- A table of responses indexed by bot + current stage + intent (which suggestion was clicked).
+- Optional randomization/glitch text overlays.
+
+### 3.2 Stage Progression
+
+For each bot:
+
+- Stage starts at **1** (NORMAL).
+- Each meaningful interaction (message sent or suggestion clicked) increments:
+  - A per‑bot “depth” counter.
+  - A global anomaly / corruption value.
+- When thresholds are hit:
+  - Stage badge text changes: `NORMAL → ANOMALY → CORRUPTED`.
+  - Visual changes trigger:
+    - Colour palette shifts (green → amber → red).
+    - UI glow and red border pulse intensify.
+    - Suggestion buttons mutate and display corrupted text.
+    - Certain messages in the script are replaced with horror variants.
+
+Global corruption may:
+
+- Lower “integrity” %
+- Increase “anomaly” count.
+- Affect timing/frequency of jumpscares and audio.
+
+---
+
+## 4. Jumpscare & Horror Layers
+
+### 4.1 Jumpscare Interrupt Layer
+
+A dedicated full‑screen overlay stack lives above the main app:
+
+- Container (`#jsLayer`) toggled by adding/removing a class (e.g. `.show`).
+- Full‑screen horror **image** (`#js-img`).
+- **Canvas** (`#js-canvas`) used for dynamic glitch / distortion drawing.
+- Scanline and vignette layers.
+- HUD text:
+  - Camera label (`CAMERA_03`).
+  - Timestamp (e.g. `07/21/1999 02:17:43`).
+  - “REC” indicator, error messages, etc.
+- Warning text fields (`#jsWarnMain`, `#jsWarnSub`) for short, punchy phrases.
+
+The jumpscare system:
+
+- Schedules random interruptions:
+  - Base interval (e.g. every 20–60 seconds).
+  - Interval shortens as corruption rises.
+- On trigger:
+  - Picks a horror image (from embedded assets).
+  - Picks warning text.
+  - Shows the layer for a short duration (2–4 seconds).
+  - Plays horror sting + looping horror bed if enabled.
+  - Returns you to the app with subtle UI corruption increases.
+
+### 4.2 Audio / Music Hooks
+
+The HTML/JS is prepared to:
+
+- Use `<audio>` tags for:
+  - Horror music loops.
+  - Jumpscare stingers.
+- Optionally use Web Audio for generated ambient noises.
+
+Typical behaviour:
+
+- No horror music at Stage 1.
+- First jumpscare:
+  - Start horror music loop for that bot.
+- Switching bots:
+  - Fade out current loop.
+  - New bot may have its own ambient.
+
+Developers can add:
+
+```html
+<audio id="horror-loop" preload="auto" loop src="horror_loop.mp3"></audio>
+```
+
+Then in JS:
+
+```js
+function startHorrorLoop() { horrorLoop.currentTime = 0; horrorLoop.play(); }
+function stopHorrorLoop()  { horrorLoop.pause(); horrorLoop.currentTime = 0; }
+```
+
+Tie these to jumpscare or corruption triggers.
+
+---
+
+## 5. CRT / VHS Visual Effects
+
+The CSS implements a layered analog display:
+
+- **Global scanlines** using `body::before`:
+  - Repeating linear gradient with transparent and dark stripes.
+- **Vignette** using `body::after`:
+  - Radial gradient darkening edges.
+- **Grain** overlay:
+  - Large absolutely‑positioned div with:
+
+    ```css
+    background-image: url("data:image/svg+xml;…feTurbulence…");
+    animation: grainMove 0.5s steps(3) infinite;
+    ```
+
+- **VHS flicker**:
+  - Irritated vertical/horizontal jitter via `@keyframes` on overlay layers.
+- **Red border pulse** on high corruption:
+  - Fixed positioned border element with animated box‑shadow.
+- **Glitch text**:
+  - `data-text` overlays in `::before` and `::after`.
+  - Slight offsets and `clip-path` slices.
+  - Short animations to simulate RGB separation and jitter.
+
+These are all pure CSS, no library required.
+
+---
+
+## 6. UI Components & Micro‑Systems
+
+### 6.1 Suggestion Buttons
+
+- Rendered under the chat input area.
+- Labels are defined per bot per stage in JS.
+- Clicking:
+  - Sends a scripted user message.
+  - Triggers the appropriate bot response.
+  - Advances stage / corruption logic.
+
+In later stages:
+
+- Buttons may:
+  - Duplicate, reorder, or “degenerate” into nonsense glyphs.
+  - Contain hidden text (screen‑readable but visually glitched).
+
+### 6.2 System Status Panel
+
+Sidebar or topbar includes:
+
+- **INTEGRITY** (percentage).
+- **UPTIME** (pseudo‑timestamp).
+- **ANOMALIES** count.
+- **STAGE badge** (`NORMAL / WARNING / CRITICAL`).
+
+These fields are updated via JS on:
+
+- Each interaction.
+- Each jumpscare.
+- Stage transitions.
+
+### 6.3 Scroll‑based Reveal (on landing page / README‑like view)
+
+- Elements marked with `.reveal`:
+  - Start with `opacity: 0` and `transform: translateY(24px)`.
+- An `IntersectionObserver` toggles `.visible` when they enter viewport:
+  - Smooth fade‑in and slide‑up effect.
+
+This gives the “marketing page” feel if you use this README code as a Github Pages landing.
+
+---
+
+## 7. How to Run / Modify
+
+### 7.1 Running the Game
+
+1. Download or clone the repo.
+2. Open `olone_final_2.html` in a modern browser:
+   - Chrome / Edge / Firefox / Safari.
+3. For best experience:
+   - Use **headphones**.
+   - Play in a dark room.
+   - Allow audio autoplay if prompted.
+
+### 7.2 Editing / Extending
+
+- **Add a new bot**
+  - Add a new sidebar item in HTML.
+  - Extend the JS bot config with:
+    - Display fields (name, icon, role).
+    - Stage scripts (responses and triggers).
+    - Suggestion sets.
+- **Add more jumpscares**
+  - Embed new base64 images or reference external URLs.
+  - Push them into the jumpscare pool.
+  - Add matching warning lines.
+- **Adjust difficulty / pacing**
+  - Change thresholds for:
+    - Stage transitions.
+    - Corruption increments.
+    - Jumpscare interval / duration.
+
+Because everything is in one file, it is straightforward (though large) to modify:
+- Search by bot name or section comments (e.g. `// JUMPSCARE LAYER`, `// BOTS`, `// STAGES`).
+- Keep script sections grouped and avoid circular dependencies.
+
+---
+
+## 8. Warnings & Content Notes
+
+- Contains jumpscares and loud horror stings.
+- Includes themes of surveillance, identity erosion, and psychological manipulation.
+- Not recommended for players sensitive to:
+  - Sudden noise.
+  - Disturbing textual imagery.
+  - “Something is wrong with my computer”‑style horror.
